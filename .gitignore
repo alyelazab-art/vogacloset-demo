@@ -20,6 +20,9 @@
 # production
 /build
 
+# local dev screenshots (chrome-devtools MCP output)
+/.next-cache-screenshots/
+
 # misc
 .DS_Store
 *.pem
@@ -30,8 +33,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
+# Internal demo repo — .env.local IS committed so cloners get keys out of the box
+# (Voga trial workspace, can rotate if it leaks). Production envs stay out.
 .env*
+!.env.local
 
 # vercel
 .vercel
