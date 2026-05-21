@@ -158,8 +158,8 @@ export default async function ProductPage({ params }: { params: Params }) {
             </p>
           </div>
 
-          {/* Loyalty tease — tier-aware */}
-          <LoyaltyTease price={product.price} />
+          {/* Loyalty tease — tier-aware; signed-in users get a live Cashback preview */}
+          <LoyaltyTease product={product} />
         </div>
       </section>
 

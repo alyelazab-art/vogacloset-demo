@@ -189,9 +189,9 @@ export function CartView() {
             </p>
           </div>
 
-          {/* VOGAVIP teaser — tier-aware */}
+          {/* VOGAVIP teaser — tier-aware; signed-in users get a live Cashback preview */}
           <div className="rounded-md bg-primary-soft p-3">
-            <LoyaltyTease price={subtotal} compact />
+            <LoyaltyTease items={items} subtotal={subtotal} compact />
             <p className="mt-1 text-[11px] text-text-muted">
               استبدلي 500 نقطة بخصومات على طلبك القادم
             </p>

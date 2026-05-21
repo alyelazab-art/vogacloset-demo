@@ -74,6 +74,7 @@ export function placeOrder(input: PlaceOrderInput): Order {
     subtotal,
     shipping,
     tax,
+    discount,
     lineItems,
     shipping_address: input.shipping_address,
     shipping_method: input.shipping_method,

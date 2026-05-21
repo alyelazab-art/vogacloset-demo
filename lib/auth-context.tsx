@@ -200,6 +200,7 @@ function seedDemoCustomersIfMissing(): void {
             subtotal: so.totalPaid,
             shipping: 0,
             tax: 0,
+            discount: 0,
             lineItems: [
               {
                 id: `seed-${so.daysAgo}`,

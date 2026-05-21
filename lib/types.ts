@@ -45,10 +45,11 @@ export type Order = {
   customerId: string;
   createdAt: string;         // ISO timestamp
   currency: "SAR";
-  totalPaid: number;         // grand total after shipping + tax (the number Gameball multiplies)
+  totalPaid: number;         // grand total after shipping + tax - discount
   subtotal: number;
   shipping: number;
   tax: number;
+  discount: number;          // SAR knocked off via VOGAVIP points (0 if none applied)
   lineItems: LineItem[];
   // shipping address (kept for the confirmation page; not sent to Gameball)
   shipping_address?: {

@@ -20,6 +20,14 @@ type OrderBody = {
   customerId: string;
   orderId: string;
   totalPaid: number;
+  // Order-level breakdowns. Gameball reconciles totalPrice = subtotal + shipping + tax
+  // against totalPaid + totalDiscount; per-line `taxes` and `discount` make line-item
+  // math reconcile too. Without these, Gameball falls back to summing lineItems[].price
+  // as the rewardable amount — which under-counts the order.
+  subtotal?: number;
+  shipping?: number;
+  tax?: number;
+  discount?: number;
   currency?: string;
   // Callers can pass either createdAt (our convention) or orderDate (Gameball's name)
   createdAt?: string;
@@ -56,23 +64,43 @@ export async function POST(request: Request) {
   // Map our shape → Gameball's expected schema.
   // - createdAt → orderDate (required)
   // - lineItems[].id → sku, .name → title (Gameball field names)
+  // - subtotal+shipping+tax → totalPrice (gross before discount), shipping → totalShipping,
+  //   tax → totalTax, discount → totalDiscount. Per-line tax is pro-rated by the line's
+  //   share of subtotal (demo has uniform 15% VAT so the split is exact).
+  const subtotal = body.subtotal ?? 0;
+  const shipping = body.shipping ?? 0;
+  const tax = body.tax ?? 0;
+  const discount = body.discount ?? 0;
+  const totalPrice = Math.round((subtotal + shipping + tax) * 100) / 100;
+
   const gameballBody = {
     customerId: body.customerId,
     orderId: body.orderId,
     orderDate: body.orderDate ?? body.createdAt ?? new Date().toISOString(),
     totalPaid: body.totalPaid,
+    totalPrice,
+    totalShipping: shipping,
+    totalTax: tax,
+    totalDiscount: discount,
     currency: body.currency ?? "SAR",
     cashbackConfigurations: body.cashbackConfigurations,
-    lineItems: body.lineItems?.map((li) => ({
-      sku: li.id,
-      productId: li.id,
-      title: li.name,
-      quantity: li.quantity,
-      price: li.price,
-      category: li.category,
-      collection: li.collection,
-      vendor: li.vendor,
-    })),
+    lineItems: body.lineItems?.map((li) => {
+      const lineSubtotal = li.price * li.quantity;
+      const lineTax =
+        subtotal > 0 ? Math.round((lineSubtotal / subtotal) * tax * 100) / 100 : 0;
+      return {
+        sku: li.id,
+        productId: li.id,
+        title: li.name,
+        quantity: li.quantity,
+        price: li.price,
+        taxes: lineTax,
+        discount: 0,
+        category: li.category,
+        collection: li.collection,
+        vendor: li.vendor,
+      };
+    }),
     // Gameball nests the hold-burn pointer inside `redemption.pointsHoldReference`
     // (NOT a top-level holdReference). Their docs confirm this is the only way to
     // tell the order to consume a pre-placed hold.

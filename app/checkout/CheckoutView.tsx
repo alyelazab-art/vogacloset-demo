@@ -269,6 +269,10 @@ export function CheckoutView() {
             customerId: order.customerId,
             orderId: order.id,
             totalPaid: order.totalPaid,
+            subtotal: order.subtotal,
+            shipping: order.shipping,
+            tax: order.tax,
+            discount: order.discount,
             currency: order.currency,
             createdAt: order.createdAt,
             cashbackConfigurations: { returnWindow: 30 },
@@ -450,7 +454,14 @@ export function CheckoutView() {
 
           {/* VOGAVIP teaser — tier-aware earn estimate based on what they'll actually pay */}
           <div className="rounded-md border border-primary/20 bg-primary-soft p-3">
-            <LoyaltyTease price={total} compact />
+            <LoyaltyTease
+              items={items}
+              subtotal={subtotal}
+              shipping={shipping}
+              tax={tax}
+              discount={discountSAR}
+              compact
+            />
           </div>
 
           {/* Apply VOGAVIP Points panel — Phase 5 burn flow */}
